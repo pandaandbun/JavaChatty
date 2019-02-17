@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2D3447;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.LoginController">
+   <children>
+      <Label fx:id="appNameLbl" layoutX="255.0" layoutY="69.0" text="Java" textAlignment="CENTER" textFill="#2196f3">
+         <font>
+            <Font name="Avenir Next Regular" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="userNameTxtField" layoutX="202.0" layoutY="167.0" prefHeight="27.0" prefWidth="200.0" promptText="Username" style="-fx-background-color: #2D3447;" />
+      <ImageView fitHeight="55.0" fitWidth="55.0" layoutX="271.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" />
+      <TextField layoutX="202.0" layoutY="206.0" prefHeight="27.0" prefWidth="200.0" promptText="Password" style="-fx-background-color: #2D3447;" />
+      <Button fx:id="signUpBtn" layoutX="517.0" layoutY="14.0" mnemonicParsing="false" onAction="#registrationBtnClicked" text="Sign UP" textFill="BLACK" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="14.0" />
+      <Label layoutX="414.0" layoutY="19.0" prefHeight="17.0" prefWidth="97.0" text="Not a member?" textFill="#a0a2ab" AnchorPane.topAnchor="19.0" />
+      <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="176.0" layoutY="209.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="/GUI/resources/password.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="176.0" layoutY="170.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="/GUI/resources/login.png" />
+         </image>
+      </ImageView>
+      <CheckBox layoutX="177.0" layoutY="254.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="117.0" text="Remember me" textFill="#a0a2ab" />
+      <Button fx:id="rememberMeBtn" layoutX="315.0" layoutY="248.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="83.0" style="-fx-background-color: #3C58FA;" text="Login">
+         <font>
+            <Font name="Avenir Next Regular" size="13.0" />
+         </font>
+      </Button>
+      <Button layoutX="205.0" layoutY="290.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="193.0" style="-fx-background-color: #2D3447;" text="Forgot password?" textFill="#a0a2ab" underline="true">
+         <font>
+            <Font name="Avenir Next Regular" size="13.0" />
+         </font>
+      </Button>
+      <Label fx:id="appNameLbl1" layoutX="299.0" layoutY="70.0" text="Chatty" textAlignment="CENTER" textFill="#a0a2ab">
+         <font>
+            <Font name="Avenir Next Regular" size="18.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
