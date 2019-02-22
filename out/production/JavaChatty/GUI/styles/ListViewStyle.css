@@ -1,0 +1,26 @@
+.list-cell {
+    -fx-cell-size: 50 ;
+    -fx-animated: true;
+    -fx-background-color: #384159;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color:#46506D;
+}
+
+.list-cell:hover{
+    -fx-background-color: #46506D;
+}
+
+.list-view {
+    -fx-background-color: #384159;
+}
+
+#userList {
+    -fx-box-border: transparent;
+}
+
+#listHbox {
+    -fx-background-color: #d5d5d5;
+    -fx-padding: 0.2;
+    -fx-spacing: -2;
+}
+
