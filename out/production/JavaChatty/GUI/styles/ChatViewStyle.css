@@ -1,0 +1,23 @@
+.list-cell {
+    -fx-cell-size: 50 ;
+    -fx-animated: true;
+    -fx-padding: 1px;
+    -fx-background-color: #4d597a;
+}
+
+.list-view {
+    -fx-background-color: #4d597a;
+    -fx-border-width: 10px 10px 10px 10px;
+}
+
+.list-cell:odd {
+    -fx-background-color: #4d597a;
+}
+
+.list-cell:even {
+    -fx-background-color: #4d597a;
+}
+
+.list-cell:filled {
+    -fx-background-color: #4d597a;
+}
