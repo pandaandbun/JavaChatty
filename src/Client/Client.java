@@ -77,10 +77,11 @@ public class Client extends JFrame {
 		do {
 			message = (String) input.readUTF();
 			showMessage("\n" + message);
-		} while (!message.equals("dEND"));
+		} while (!message.equals("END"));
 	}
 
 	// Close connection
+	
 	private void closeConnection() {
 		showMessage("\n Closing the connection!");
 		try {
