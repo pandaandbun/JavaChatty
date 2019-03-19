@@ -48,7 +48,7 @@ public class Server {
 									String password = splitted[2];
 
 									if (Register(clientEmail, password)) {
-										System.out.println("Registering " + clientEmail + "succeed");
+										System.out.println("Registering " + clientEmail + "succeeded");
 										dOut.writeUTF("SERVER - " + clientEmail + " succesfully created!");
 									} else if (!Register(clientEmail, password)) {
 										System.out.println("Registering " + clientEmail + "failed");
@@ -62,6 +62,7 @@ public class Server {
 									String password = splitted[2];
 
 									if (Login(clientEmail, password)) {
+										System.out.println("Logging in " + clientEmail + "succeeded");
 										dOut.writeUTF("SERVER - " + clientEmail + " succesfully Login!");
 
 										// Send Client their friend list
@@ -69,8 +70,8 @@ public class Server {
 										dOut.writeUTF(friendList);
 
 									} else if (!Login(clientEmail, password)) {
-										dOut.writeUTF("SERVER - " + clientEmail
-												+ " either does not exist or is already login!");
+										System.out.println("Logging in " + clientEmail + "failed");
+										dOut.writeUTF("SERVER - " + clientEmail + " either does not exist or is already login!");
 									}
 								}
 
@@ -80,10 +81,14 @@ public class Server {
 									String friendEmail = splitted[2];
 
 									if (addFriend(clientEmail, friendEmail)) {
+										
+										System.out.println("Adding " + friendEmail + " as a friend of " + clientEmail + "succeeded");
 										dOut.writeUTF("SERVER - " + friendEmail + " was added succesfully!");
+										
 									} else if (!addFriend(clientEmail, friendEmail)) {
-										dOut.writeUTF("SERVER - " + clientEmail
-												+ " either does not exist or is already your friend!");
+										
+										System.out.println("Adding " + friendEmail + " as a friend of " + clientEmail + "failed");
+										dOut.writeUTF("SERVER - " + clientEmail + " either does not exist or is already your friend!");
 									}
 								}
 
@@ -94,10 +99,12 @@ public class Server {
 									String message = splitted[3];
 
 									if (!emails.contains(friendEmail)) {
+										System.out.println(friendEmail + " is not online");
 										dOut.writeUTF("SERVER - " + friendEmail + " is not online.");
 									}
 
 									if (emails.contains(friendEmail)) {
+										System.out.println(clientEmail + " --> " + friendEmail + " ---- " + message);
 										clients.get(emails.indexOf(friendEmail)).writeUTF(clientEmail + " - " + message);
 										clients.get(emails.indexOf(friendEmail)).flush();
 									}
@@ -112,6 +119,8 @@ public class Server {
 									dIn.close();
 									dOut.close();
 									socket.close();
+									
+									System.out.println(clientEmail + " successfully logout!");
 								}
 
 								System.out.println();

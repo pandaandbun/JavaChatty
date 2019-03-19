@@ -16,7 +16,7 @@ class FriendCellRenderer implements Callback<ListView<User>,ListCell<User>>{
     @Override
     public ListCell<User> call(ListView<User> p) {
 
-        ListCell<User> cell = new ListCell<>(){
+        ListCell<User> cell = new ListCell<User>(){
 
             @Override
             protected void updateItem(User user, boolean bln) {
