@@ -1,3 +1,5 @@
+package DB;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
@@ -7,7 +9,7 @@ import java.io.File.*;
 import DB.User;
 
 public class Login{
-    public boolean CheckLogin(String email, String password){
+    public boolean LogIn(String email, String password){
         if (checkexist(email) == true){
             User user = readObjectFile(email);
             if (user.getpassword().equals(password)){

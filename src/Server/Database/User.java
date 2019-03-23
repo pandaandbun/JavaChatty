@@ -28,7 +28,7 @@ public class User implements Serializable {
         this.password   = password;
     }
 
-    public void addFriend(String ClientEmail, String friendEmail){
+    public void addFriend(String friendEmail){
         if (checkFriendExist(friendEmail) == true){
             System.out.println("friend already exists");
             return;
@@ -45,7 +45,9 @@ public class User implements Serializable {
         return false;
     }
 
-    public List<String> getFriendList(String ClientEmail){
+    public List<String> getFriendList(){
         return this.friendList;
     }
+
+
 }
