@@ -28,21 +28,28 @@ public class ClientGUI extends Application {
 		taBox.setEditable(false);
 		
 		Client cli = new Client (taBox);
-		taBox.appendText("Hello");
 		
-		HBox hbUser = new HBox (new Label("Username: "), tfName);
-		HBox hbFriend = new HBox (new Label("Friend: "), tffriend);
-		HBox hbMsg = new HBox (new Label("Message: "), tfMsg);
-		
-		Button sendBt = new Button("Send");
 		Button regBt = new Button("Register");
 		Button loginBt = new Button("Login");
+		Button sendBt = new Button("Send");
 		Button addBt = new Button("Add Friend");
+		Button friendBt = new Button("Get Friend");
 		Button exitBt = new Button("Exit");
+		
+		Label msg = new Label("Password/Message: ");
+		
+		HBox hbUser = new HBox (new Label("User: "), tfName);
+		HBox hbFriend = new HBox (new Label("Friend: "), tffriend);
+		HBox hbMsg = new HBox (msg, tfMsg);
+		
+		HBox firstBox = new HBox(regBt, loginBt);
+		HBox secBox = new HBox(addBt, friendBt);
+		firstBox.setSpacing(10);
+		secBox.setSpacing(10);
 
 
 		VBox vb = new VBox();
-		vb.getChildren().addAll(hbUser, hbFriend, hbMsg, taBox, sendBt, regBt, loginBt, addBt, exitBt);
+		vb.getChildren().addAll(hbUser, hbFriend, hbMsg, taBox, firstBox, secBox, sendBt, exitBt);
 		vb.setPadding(new Insets(20, 20, 50, 20));
 		vb.setSpacing(10);
 		
@@ -62,7 +69,12 @@ public class ClientGUI extends Application {
 		});
 		
 		addBt.setOnAction(e -> {
-			String message = "ADDFRIEND" + "#" + tfName.getText() + "#" + tfMsg.getText();
+			String message = "ADDFRIEND" + "#" + tfName.getText() + "#" + tffriend.getText();
+			cli.sendMessage(message);
+		});
+		
+		friendBt.setOnAction(e -> {
+			String message = "GETFRIEND" + "#" + tfName.getText();
 			cli.sendMessage(message);
 		});
 

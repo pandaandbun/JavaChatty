@@ -3,7 +3,7 @@ package Server;
 //Database
 import Server.Database.createProfile;
 import Server.Database.Login;
-import Server.Database.User;
+import Server.Database.friend;
 
 import java.io.*;
 import java.net.*;
@@ -34,7 +34,8 @@ public class Server extends Application {
 
 	// Database
 	private createProfile cb = new createProfile();
-	//private Login lg = new Login();
+	private Login lg = new Login();
+	private friend fr = new friend();
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) {
@@ -95,7 +96,14 @@ public class Server extends Application {
 				// Create data input and output streams
 				din = new DataInputStream(socket.getInputStream());
 				dout = new DataOutputStream(socket.getOutputStream());
-
+				dout.writeUTF("SERVER: Welcome to JavaChatty. The best Messenger App in CSCI 2020 - 2019."
+						+ "\nPlease type in your password in the Message Box for Registration and Login. "
+						+ "\nHow To Use:"
+						+ "\n1. Register/Login: Enter your username in User and password in Password/Message."
+						+ "\n2. Add Friend/Get Friend: Enter your username in User and/or your friend's username in Friend"
+						+ "\n3. Send: Enter your username in User, your friend's username in Friend and the message in  Password/Message"
+						+ "\n4. Exit: Enter your username, if you logged in, in the User. If not, just press Exit."
+						+ "\nEnjoy JavaChatty!");
 				// Continuously serve the client
 				while (true) {
 					String line = din.readUTF();
@@ -108,7 +116,10 @@ public class Server extends Application {
 
 					// END
 					if (command.equals("END")) {
-						String clientEmail = splitted[1];
+						String clientEmail = "";
+						if (splitted.length > 1) {
+							clientEmail = splitted[1];
+						}
 						logOut(clientEmail);
 						break;
 					}
@@ -117,29 +128,38 @@ public class Server extends Application {
 					if (command.equals("REGISTER")) {
 						String clientEmail = splitted[1];
 						String password = splitted[2];
-						Register(clientEmail, password);
-					}
 
-					// LOGIN
-					if (command.equals("LOGIN")) {
+						Register(clientEmail, password);
+					} // LOGIN
+					else if (command.equals("LOGIN")) {
 						String clientEmail = splitted[1];
 						String password = splitted[2];
-						//Login(clientEmail, password);
+						Login(clientEmail, password);
 					}
 
-					// ADD FRIEND (IN PROGRESS)
-					if (command.equals("ADDFRIEND")) {
-						String clientEmail = splitted[1];
-						String friendEmail = splitted[2];
-						addFriend(clientEmail, friendEmail);
-					}
+					String clientEmail = splitted[1];
 
-					// MESSAGE
-					if (command.equals("MESSAGE")) {
-						String clientEmail = splitted[1];
-						String friendEmail = splitted[2];
-						String message = splitted[3];
-						sendMessage(clientEmail, friendEmail, message);
+					if (clients.containsKey(clientEmail)) {
+
+						// ADD FRIEND
+						if (command.equals("ADDFRIEND")) {
+							String friendEmail = splitted[2];
+							addFriend(clientEmail, friendEmail);
+						}
+
+						// GETFRIEND
+						if (command.equals("GETFRIEND")) {
+							getFriend(clientEmail);
+						}
+
+						// MESSAGE
+						if (command.equals("MESSAGE")) {
+							String friendEmail = splitted[2];
+							String message = splitted[3];
+							sendMessage(clientEmail, friendEmail, message);
+						}
+					} else {
+						dout.writeUTF("\nSERVER: Please Logged In or Register.");
 					}
 				}
 			} catch (IOException ex) {
@@ -149,13 +169,26 @@ public class Server extends Application {
 
 		// send message to client
 		public void sendMessage(String clientEmail, String friendEmail, String message) throws IOException {
-			clients.get(friendEmail).writeUTF("\n" + clientEmail + ": " + message);
-			clients.get(friendEmail).flush();
+			boolean isProfileinDB = cb.checkProfile(friendEmail);
+
+			if (isProfileinDB) {
+				if (clients.containsKey(friendEmail)) {
+					clients.get(friendEmail).writeUTF("\n" + clientEmail + ": " + message);
+					clients.get(friendEmail).flush();
+				} else {
+					dout.writeUTF("\nSERVER: " + friendEmail + " is not online.");
+				}
+			} else {
+				dout.writeUTF("\nSERVER: " + friendEmail + " does not exist.");
+			}
 		}
 
 		public void logOut(String clientEmail) throws IOException {
 			dout.writeUTF("END");
-			clients.remove(clientEmail);
+			if (clients.containsKey(clientEmail)) {
+				clients.remove(clientEmail);
+			}
+
 			din.close();
 			socket.close();
 		}
@@ -168,7 +201,7 @@ public class Server extends Application {
 				isProfileCreated = cb.createProfile(clientEmail, password);
 				if (isProfileCreated) {
 					clients.put(clientEmail, dout);
-					dout.writeUTF("\nSERVER: Account Registered.");
+					dout.writeUTF("\nSERVER: Account Registered. You are now Logged In");
 
 				} else {
 					dout.writeUTF("\nSERVER: Account Failed to Registered.");
@@ -178,39 +211,49 @@ public class Server extends Application {
 			}
 
 		}
-/*
+
 		public void Login(String clientEmail, String password) throws IOException {
-			System.out.println("Login");
 			boolean isProfileinDB = cb.checkProfile(clientEmail);
 
 			if (isProfileinDB) {
-				System.out.println("Login - 1");
 				if (clients.containsKey(clientEmail)) {
 					dout.writeUTF("\nSERVER: Account Already Online.");
 				}
 
-				if (!lg.CheckLogin(clientEmail, password)) {
+				if (!lg.LogIn(clientEmail, password)) {
 					dout.writeUTF("\nSERVER: Incorrect Email or Password.");
 				}
 
-				if (!clients.containsKey(clientEmail) && lg.CheckLogin(clientEmail, password)) {
+				if (!clients.containsKey(clientEmail) && lg.LogIn(clientEmail, password)) {
 					clients.put(clientEmail, dout);
 					dout.writeUTF("\nSERVER: Account Logged In.");
 				}
 			} else if (!isProfileinDB) {
-				System.out.println("Login - 5");
 				dout.writeUTF("\nSERVER: Account Not Registered.");
 			}
 		}
-*/
+
 		public void addFriend(String clientEmail, String friendEmail) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(friendEmail);
 
 			if (isProfileinDB) {
-				// ur.addFriend(clientEmail, friendEmail);
-				dout.writeUTF("\nSERVER: " + friendEmail + " was added to" + clientEmail + "'s Friend List.");
+				if (fr.addFriend(clientEmail, friendEmail)) {
+					dout.writeUTF("\nSERVER: " + friendEmail + " was added to " + clientEmail + "'s Friend List.");
+				} else {
+					dout.writeUTF("\nSERVER: " + friendEmail + " is already in " + clientEmail + "'s Friend List.");
+				}
 			} else if (!isProfileinDB) {
-				dout.writeUTF("\nSERVER: " + friendEmail + " is already in" + clientEmail + "'s Friend List.");
+				dout.writeUTF("\nSERVER: " + friendEmail + " does not exist.");
+			}
+		}
+
+		public void getFriend(String clientEmail) throws IOException {
+			boolean isProfileinDB = cb.checkProfile(clientEmail);
+
+			if (isProfileinDB) {
+				dout.writeUTF("\nSERVER: " + clientEmail + "'s Friend List: " + fr.getFriendList(clientEmail));
+			} else if (!isProfileinDB) {
+				dout.writeUTF("\nSERVER: " + clientEmail + " does not exist.");
 			}
 		}
 

@@ -9,45 +9,40 @@ import java.io.File.*;
 import Server.Database.User;
 
 public class createProfile {
-<<<<<<< HEAD
 
+	public static boolean createProfile(String email, String password) {
+		createProfile objectIO = new createProfile();
 
-=======
-	
->>>>>>> 1e58302687208b3d16955bd443257d0306f03e99
-    public static boolean createProfile(String email, String password){
-        createProfile objectIO = new createProfile();
+		User user = new User(email, password);// should get information by here
+		objectIO.WriteObjectToFile(user.getemail(), user, true);
+		if (checkProfile(user.getemail()) == true) {
+			return true;
+		}
+		return false;
+	}
 
-        User user = new User(email,password);//should get information by here
-        objectIO.WriteObjectToFile(user.getemail(),user,true);
-        if (checkProfile(user.getemail()) == true){
-            return true;
-        }
-        return false;
-    }
+	public static boolean checkProfile(String email) {
+		File tmp = new File(email);
+		boolean exist = tmp.exists();
+		return exist;
+	}
 
-    public static boolean checkProfile(String email){
-        File tmp = new File(email);
-        boolean exist = tmp.exists();
-        return exist;
-    }
+	public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
 
-    public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
+		try {
+			if ((checkProfile(fileName) == true) && (indicator == true)) {
+				System.out.println("user data already exist");
+				return;
+			}
+			File f = new File(fileName);
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
+			oos.writeObject(user);
+			oos.flush();
+			oos.close();
+			System.out.println("The Object  was succesfully written to a file");
 
-        try {
-            if ((checkProfile(fileName) == true) && (indicator == true)){
-                System.out.println("user data already exist");
-                return;
-            }
-            File f = new File(fileName);
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
-            oos.writeObject(user);
-            oos.flush();
-            oos.close();
-            System.out.println("The Object  was succesfully written to a file");
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 }
