@@ -11,7 +11,6 @@ public class User implements Serializable {
 
 
     private String email;
-    private String name;
     private String password;
     private List<String> friendList = new ArrayList<>();
 
@@ -20,13 +19,6 @@ public class User implements Serializable {
         return email;
     }
 
-    public String getname(){
-        return name;
-    }
-
-    public void setname(String name){
-        this.name = name;
-    }
 
     public String getpassword(){
         return password;
@@ -40,11 +32,6 @@ public class User implements Serializable {
     public User(){
     }
 
-    public User(String email, String password, String name){
-        this.email = email;
-        this.password = password;
-        this.name = name;
-    }
 
     public void addFriend(String friendEmail){
         if (checkFriendExist(friendEmail) == true){

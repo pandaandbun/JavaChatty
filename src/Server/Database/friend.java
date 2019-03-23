@@ -23,10 +23,6 @@ public class friend{
         }
     }
 
-    public static String getname(String clientEmail){
-        User user = readObjectFile(clientEmail);
-        return user.getname();
-    }
 
     public static boolean addFriend(String clientEmail, String friendEmail){
         User user = readObjectFile(clientEmail);
@@ -50,10 +46,10 @@ public class friend{
         }
     }
 
-    public static boolean createProfile(String email, String password, String name){
+    public static boolean createProfile(String email, String password){
         createProfile objectIO = new createProfile();
 
-        User user = new User(email,password,name);//should get information by here
+        User user = new User(email,password);//should get information by here
         objectIO.WriteObjectToFile(user.getemail(),user, true);
         if (checkProfile(user.getemail()) == true){
             return true;
