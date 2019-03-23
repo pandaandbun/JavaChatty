@@ -22,7 +22,7 @@ public class User implements Serializable {
     public String getpassword(){
         return password;
     }
-
+    
     public User(String email, String password){
         this.email      = email;
         this.password   = password;
