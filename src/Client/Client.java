@@ -8,54 +8,52 @@ import java.net.*;
 
 public class Client {
 
+	// Input and Output
 	private DataOutputStream output;
 	private DataInputStream input;
+
+	// Socket Connection
 	private Socket connection;
+
+	// Chat Box
 	private TextArea taBox;
-	
-	private ClientGUI cl;
-	
+
 	// constructor
 	public Client(TextArea taBox) {
 		this.taBox = taBox;
 		try {
+			// Client - Server Connection Set Up
 			connectToServer();
 			setupStreams();
-			
+
+			// Creating a new thread to listen
 			new Thread(() -> {
 				try {
-					whileChatting();
+					listener();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}).start();
 
-		} catch (EOFException eofException) {
-			eofException.printStackTrace();
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
 	}
 
-	// connect to server
+	// Connect to server
 	private void connectToServer() throws IOException {
 		connection = new Socket("127.0.0.1", 8080);
 	}
 
-	// set up streams
+	// Set up streams
 	private void setupStreams() throws IOException {
 		input = new DataInputStream(connection.getInputStream());
 		output = new DataOutputStream(connection.getOutputStream());
 		output.flush();
 	}
-	
-	public DataInputStream getInput () {
-		return input;
-	}
 
-	// while chatting with server
-	public void whileChatting() throws IOException {
+	// Client Listening for messages from the server
+	public void listener() throws IOException {
 		String message = "";
 		do {
 			message = (String) input.readUTF();
@@ -77,7 +75,7 @@ public class Client {
 		}
 	}
 
-	// send message to server
+	// Send message to server
 	public void sendMessage(String message) {
 		try {
 			output.writeUTF(message);

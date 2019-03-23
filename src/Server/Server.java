@@ -21,7 +21,6 @@ public class Server extends Application {
 
 	// Mapping of sockets to clientEmails
 	private Hashtable<String, DataOutputStream> clients = new Hashtable<String, DataOutputStream>();
-	// static createProfile cp = new createProfile();
 
 	// Text area for displaying contents
 	private TextArea ta = new TextArea();
@@ -29,6 +28,7 @@ public class Server extends Application {
 	// Server socket
 	private ServerSocket serverSocket;
 
+	// Pane and Exit Button
 	private VBox vb = new VBox();
 	private Button exitBt = new Button("Exit");
 
@@ -39,12 +39,15 @@ public class Server extends Application {
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) {
+		// Setting the text display to be not editable
 		ta.setEditable(false);
 
+		// Adding Text Area and Exit Button to a vertical pane
 		vb.getChildren().addAll(ta, exitBt);
 		vb.setPadding(new Insets(20, 20, 50, 20));
 		vb.setSpacing(10);
 
+		// Set action on exit to terminate the program
 		exitBt.setOnAction(e -> {
 			System.exit(0);
 		});
@@ -96,6 +99,8 @@ public class Server extends Application {
 				// Create data input and output streams
 				din = new DataInputStream(socket.getInputStream());
 				dout = new DataOutputStream(socket.getOutputStream());
+
+				// Introduction
 				dout.writeUTF("SERVER: Welcome to JavaChatty. The best Messenger App in CSCI 2020 - 2019."
 						+ "\nPlease type in your password in the Message Box for Registration and Login. "
 						+ "\nHow To Use:"
@@ -104,14 +109,18 @@ public class Server extends Application {
 						+ "\n3. Send: Enter your username in User, your friend's username in Friend and the message in  Password/Message"
 						+ "\n4. Exit: Enter your username, if you logged in, in the User. If not, just press Exit."
 						+ "\nEnjoy JavaChatty!");
+
 				// Continuously serve the client
 				while (true) {
+
+					// Listen for a message from the clients
 					String line = din.readUTF();
+
 					// Making sense of the message sent by the client
 					String[] splitted = line.split("#");
 					String command = splitted[0];
 
-					// Add chat to the server ta
+					// Add chat to the Text Area
 					ta.appendText(line + '\n');
 
 					// END
@@ -123,6 +132,8 @@ public class Server extends Application {
 						logOut(clientEmail);
 						break;
 					}
+
+					/* HANDLING CLIENTS COMMANDS */
 
 					// REGISTRATION
 					if (command.equals("REGISTER")) {
@@ -139,6 +150,7 @@ public class Server extends Application {
 
 					String clientEmail = splitted[1];
 
+					// If Client is online
 					if (clients.containsKey(clientEmail)) {
 
 						// ADD FRIEND
@@ -167,22 +179,28 @@ public class Server extends Application {
 			}
 		}
 
-		// send message to client
+		// Send message to friend
 		public void sendMessage(String clientEmail, String friendEmail, String message) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(friendEmail);
+			List<String> friendList = fr.getFriendList(clientEmail);
 
 			if (isProfileinDB) {
-				if (clients.containsKey(friendEmail)) {
-					clients.get(friendEmail).writeUTF("\n" + clientEmail + ": " + message);
-					clients.get(friendEmail).flush();
+				if (friendList.contains(friendEmail)) {
+					if (clients.containsKey(friendEmail)) {
+						clients.get(friendEmail).writeUTF("\n" + clientEmail + ": " + message);
+						clients.get(friendEmail).flush();
+					} else {
+						dout.writeUTF("\nSERVER: " + friendEmail + " is not online.");
+					}
 				} else {
-					dout.writeUTF("\nSERVER: " + friendEmail + " is not online.");
+					dout.writeUTF("\nSERVER: " + friendEmail + " is not your friend.");
 				}
 			} else {
 				dout.writeUTF("\nSERVER: " + friendEmail + " does not exist.");
 			}
 		}
 
+		// Logging the client out
 		public void logOut(String clientEmail) throws IOException {
 			dout.writeUTF("END");
 			if (clients.containsKey(clientEmail)) {
@@ -193,6 +211,7 @@ public class Server extends Application {
 			socket.close();
 		}
 
+		// Register the client to the Database
 		public void Register(String clientEmail, String password) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(clientEmail);
 			boolean isProfileCreated = false;
@@ -212,6 +231,7 @@ public class Server extends Application {
 
 		}
 
+		// Logging the client in
 		public void Login(String clientEmail, String password) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(clientEmail);
 
@@ -233,6 +253,7 @@ public class Server extends Application {
 			}
 		}
 
+		// Adding friend to the client database
 		public void addFriend(String clientEmail, String friendEmail) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(friendEmail);
 
@@ -247,6 +268,7 @@ public class Server extends Application {
 			}
 		}
 
+		// Getting the client friend list
 		public void getFriend(String clientEmail) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(clientEmail);
 
