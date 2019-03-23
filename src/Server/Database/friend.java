@@ -21,7 +21,6 @@ public class friend{
         for (int i = 0; i < fl.size();i++){
             System.out.println(fl.get(i));
         }
-
     }
 
     public static String getname(String clientEmail){
@@ -51,10 +50,10 @@ public class friend{
         }
     }
 
-    public static boolean createProfile(String email, String password){
+    public static boolean createProfile(String email, String password, String name){
         createProfile objectIO = new createProfile();
 
-        User user = new User(email,password);//should get information by here
+        User user = new User(email,password,name);//should get information by here
         objectIO.WriteObjectToFile(user.getemail(),user, true);
         if (checkProfile(user.getemail()) == true){
             return true;
