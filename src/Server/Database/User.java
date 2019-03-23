@@ -24,7 +24,7 @@ public class User implements Serializable {
         return name;
     }
 
-    public void setname(name){
+    public void setname(String name){
         this.name = name;
     }
 
