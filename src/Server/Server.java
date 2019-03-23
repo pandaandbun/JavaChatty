@@ -1,8 +1,10 @@
 package Server;
 
+//Database
 import Server.Database.createProfile;
 import Server.Database.Login;
 import Server.Database.User;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -32,8 +34,7 @@ public class Server extends Application {
 
 	// Database
 	private createProfile cb = new createProfile();
-	private Login lg = new Login();
-	// private User ur = new User();
+	//private Login lg = new Login();
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) {
@@ -123,7 +124,7 @@ public class Server extends Application {
 					if (command.equals("LOGIN")) {
 						String clientEmail = splitted[1];
 						String password = splitted[2];
-						Login(clientEmail, password);
+						//Login(clientEmail, password);
 					}
 
 					// ADD FRIEND (IN PROGRESS)
@@ -177,7 +178,7 @@ public class Server extends Application {
 			}
 
 		}
-
+/*
 		public void Login(String clientEmail, String password) throws IOException {
 			System.out.println("Login");
 			boolean isProfileinDB = cb.checkProfile(clientEmail);
@@ -201,7 +202,7 @@ public class Server extends Application {
 				dout.writeUTF("\nSERVER: Account Not Registered.");
 			}
 		}
-
+*/
 		public void addFriend(String clientEmail, String friendEmail) throws IOException {
 			boolean isProfileinDB = cb.checkProfile(friendEmail);
 

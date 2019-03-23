@@ -11,15 +11,17 @@ public class Client {
 	private DataOutputStream output;
 	private DataInputStream input;
 	private Socket connection;
-	private ClientGUI test = new ClientGUI();
 	private TextArea taBox;
-
+	
+	private ClientGUI cl;
+	
 	// constructor
 	public Client(TextArea taBox) {
 		this.taBox = taBox;
 		try {
 			connectToServer();
 			setupStreams();
+			
 			new Thread(() -> {
 				try {
 					whileChatting();
@@ -46,6 +48,10 @@ public class Client {
 		input = new DataInputStream(connection.getInputStream());
 		output = new DataOutputStream(connection.getOutputStream());
 		output.flush();
+	}
+	
+	public DataInputStream getInput () {
+		return input;
 	}
 
 	// while chatting with server

@@ -1,18 +1,19 @@
+package Server.Database;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.File;
 import java.io.File.*;
-import DB.User;
+import Server.Database.User;
 
 public class createProfile {
-
-
-    public static boolean createProfile(String email, String password, String name){
+	
+    public static boolean createProfile(String email, String password){
         createProfile objectIO = new createProfile();
 
-        User user = new User(email,password,name);//should get information by here
+        User user = new User(email,password);//should get information by here
         objectIO.WriteObjectToFile(user.getemail(),user,true);
         if (checkProfile(user.getemail()) == true){
             return true;
@@ -25,7 +26,6 @@ public class createProfile {
         boolean exist = tmp.exists();
         return exist;
     }
-
 
     public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
 
