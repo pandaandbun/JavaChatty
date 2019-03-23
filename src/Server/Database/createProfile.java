@@ -1,14 +1,20 @@
+package Server.Database;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.File;
 import java.io.File.*;
-import DB.User;
+import Server.Database.User;
 
 public class createProfile {
+<<<<<<< HEAD
 
 
+=======
+	
+>>>>>>> 1e58302687208b3d16955bd443257d0306f03e99
     public static boolean createProfile(String email, String password){
         createProfile objectIO = new createProfile();
 
@@ -25,7 +31,6 @@ public class createProfile {
         boolean exist = tmp.exists();
         return exist;
     }
-
 
     public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
 

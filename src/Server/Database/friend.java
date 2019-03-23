@@ -1,3 +1,5 @@
+package Server.Database;
+
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.FileInputStream;
@@ -6,7 +8,7 @@ import java.io.File;
 import java.io.File.*;
 import java.util.ArrayList;
 import java.util.List;
-import DB.User;
+import Server.Database.User;
 
 public class friend{
     public static List<String> getFriendList(String ClientEmail){
@@ -21,6 +23,7 @@ public class friend{
         for (int i = 0; i < fl.size();i++){
             System.out.println(fl.get(i));
         }
+
     }
 
 
