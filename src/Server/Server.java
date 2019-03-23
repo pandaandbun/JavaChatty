@@ -1,185 +1,151 @@
 package Server;
 
-import Server.Database.Datebase;
+import Server.Database.createProfile;
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
+import java.util.*;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-public class Server {
+public class Server extends Application {
 
-	static ArrayList<DataOutputStream> clients = new ArrayList<DataOutputStream>();
-	static ArrayList<String> emails = new ArrayList<String>();
-	static Datebase db = new Datebase();
+	// Mapping of sockets to clientEmails
+	private Hashtable clients = new Hashtable();
+	// static createProfile cp = new createProfile();
 
-	public static void main(String[] args) {
-		int port = 8080; // random port numbes
+	// Text area for displaying contents
+	private TextArea ta = new TextArea();
 
+	// Server socket
+	private ServerSocket serverSocket;
+
+	private VBox vb = new VBox();
+	private Button exitBt = new Button("Exit");
+
+	private createProfile cb = new createProfile();
+
+	@Override // Override the start method in the Application class
+	public void start(Stage primaryStage) {
+		ta.setEditable(false);
+
+		vb.getChildren().addAll(ta, exitBt);
+		vb.setPadding(new Insets(20, 20, 50, 20));
+		vb.setSpacing(10);
+
+		exitBt.setOnAction(e -> {
+			System.exit(0);
+		});
+
+		// Create a scene and place it in the stage
+		Scene scene = new Scene(vb);
+		primaryStage.setTitle("Lab 10"); // Set the stage title
+		primaryStage.setScene(scene); // Place the scene in the stage
+		primaryStage.show(); // Display the stage
+
+		new Thread(() -> listen()).start();
+	}
+
+	private void listen() {
 		try {
-			ServerSocket ss = new ServerSocket(port);
-
-			System.out.println("Waiting for a client....");
-			System.out.println("Got a client :) ... Finally, someone saw me through all the cover!");
-			System.out.println();
+			// Create a server socket
+			serverSocket = new ServerSocket(8080);
+			Platform.runLater(() -> ta.appendText("MultiThreadServer started at " + new Date() + '\n'));
 
 			while (true) {
-				Socket socket = ss.accept();
-				// SSocket sSocket = new SSocket(socket, clients);
-				Thread t = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							DataInputStream dIn = new DataInputStream(socket.getInputStream());
-							DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-							clients.add(dOut);
+				// Listen for a new connection request
+				Socket socket = serverSocket.accept();
 
-							while (true) {
-								// Message
-								String line = dIn.readUTF();
+				// Display the client number
+				Platform.runLater(() -> ta.appendText("Connection from " + socket + " at " + new Date() + '\n'));
 
-								System.out.println("Command----" + line);
+				// Save output stream to hashtable
+				// clients.put(clientEmail, dout);
 
-								// Make sense of the Message
-								String[] splitted = line.split("#");
-								String command = splitted[0];
+				// Create a new thread for the connection
+				new ServerThread(socket);
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
 
-								// Registration Command
-								if (command.toLowerCase() == "register") {
-									String clientEmail = splitted[1];
-									String password = splitted[2];
+	class ServerThread extends Thread {
+		private Socket socket;
+		//private String[] splitted;
+		//private String clientEmail = "";
+		//private String friendEmail = "";
+		//private String password = "";
+		private DataInputStream din;
+		private DataOutputStream dout;
 
-									if (Register(clientEmail, password)) {
-										System.out.println("Registering " + clientEmail + "succeeded");
-										dOut.writeUTF("SERVER - " + clientEmail + " succesfully created!");
-									} else if (!Register(clientEmail, password)) {
-										System.out.println("Registering " + clientEmail + "failed");
-										dOut.writeUTF("SERVER - " + clientEmail + " already exist!");
-									}
-								}
+		/** Construct a thread */
+		public ServerThread(Socket socket) {
+			this.socket = socket;
+			start();
+		}
 
-								// Log in Command
-								if (command.toLowerCase() == "login") {
-									String clientEmail = splitted[1];
-									String password = splitted[2];
+		/** Run a thread */
+		public void run() {
+			try {
+				// Create data input and output streams
+				din = new DataInputStream(socket.getInputStream());
+				dout = new DataOutputStream(socket.getOutputStream());
 
-									if (Login(clientEmail, password)) {
-										System.out.println("Logging in " + clientEmail + "succeeded");
-										dOut.writeUTF("SERVER - " + clientEmail + " succesfully Login!");
+				// Continuously serve the client
+				while (true) {
+					String line = din.readUTF();
 
-										// Send Client their friend list
-										String friendList = String.join("#", getFriends(clientEmail));
-										dOut.writeUTF(friendList);
-
-									} else if (!Login(clientEmail, password)) {
-										System.out.println("Logging in " + clientEmail + "failed");
-										dOut.writeUTF("SERVER - " + clientEmail + " either does not exist or is already login!");
-									}
-								}
-
-								// Add friend Command
-								if (command.toLowerCase() == "addfriend") {
-									String clientEmail = splitted[1];
-									String friendEmail = splitted[2];
-
-									if (addFriend(clientEmail, friendEmail)) {
-										
-										System.out.println("Adding " + friendEmail + " as a friend of " + clientEmail + "succeeded");
-										dOut.writeUTF("SERVER - " + friendEmail + " was added succesfully!");
-										
-									} else if (!addFriend(clientEmail, friendEmail)) {
-										
-										System.out.println("Adding " + friendEmail + " as a friend of " + clientEmail + "failed");
-										dOut.writeUTF("SERVER - " + clientEmail + " either does not exist or is already your friend!");
-									}
-								}
-
-								// Message Command
-								if (command.toLowerCase() == "message") {
-									String clientEmail = splitted[1];
-									String friendEmail = splitted[2];
-									String message = splitted[3];
-
-									if (!emails.contains(friendEmail)) {
-										System.out.println(friendEmail + " is not online");
-										dOut.writeUTF("SERVER - " + friendEmail + " is not online.");
-									}
-
-									if (emails.contains(friendEmail)) {
-										System.out.println(clientEmail + " --> " + friendEmail + " ---- " + message);
-										clients.get(emails.indexOf(friendEmail)).writeUTF(clientEmail + " - " + message);
-										clients.get(emails.indexOf(friendEmail)).flush();
-									}
-								}
-
-								// Logout Command
-								if (command.toLowerCase() == "logout") {
-									String clientEmail = splitted[1];
-							
-									clients.remove(dOut);
-									emails.remove(clientEmail);
-									dIn.close();
-									dOut.close();
-									socket.close();
-									
-									System.out.println(clientEmail + " successfully logout!");
-								}
-
-								System.out.println();
-							}
-						} catch (Exception e) {
-							System.out.println(e);
-						}
+					if (line.equals("END")) {
+						din.close();
+						socket.close();
+						break;
 					}
-				});
+					
+					// Making sense of the message sent by the client
+					String[] splitted = line.split("#");
+					String command = splitted[0];
 
-				t.start();
+					// REGISTRATION
+					if (command.equals("REGISTER")) {
+						String clientEmail = splitted[1];
+						String password = splitted[2];
+						Register(clientEmail, password); 
+					}
+
+					
+					// Add chat to the server ta
+					// ta.appendText(clientEmail + ": " + line + '\n');
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-
-	public static boolean Register(String clientEmail, String password) {
-		boolean isProfileinDB = db.checkProfile(clientEmail);
-		boolean isProfileinDBNow = false;
-
-		if (!isProfileinDB) {
-			isProfileinDBNow = db.createProfile(clientEmail, password);
 		}
 
-		return isProfileinDBNow;
-	}
+		public void Register(String clientEmail, String password) throws IOException {
+			boolean isProfileinDB = cb.checkProfile(clientEmail);
+			boolean isProfileCreated = false;
 
-	public static boolean Login(String clientEmail, String password) {
-		boolean isProfileinDB = db.checkProfile(clientEmail);
-
-		if (isProfileinDB) {
-			if (!emails.contains(clientEmail)) {
-				emails.add(clientEmail);
-				return db.logIn(clientEmail, password);
-			} else if (emails.contains(clientEmail)) {
-				return false;
+			if (!isProfileinDB) {
+				isProfileCreated = cb.createProfile(clientEmail, password);
+				if (isProfileCreated) {
+					dout.writeUTF("SERVER: Account Registered.");
+				} else {
+					dout.writeUTF("SERVER: Account Failed to Registered.");
+				}
+			} else if (isProfileinDB) {
+				dout.writeUTF("SERVER: Account already existed.");
 			}
-		} else if (!isProfileinDB) {
-			return false;
-		}
-	}
-	
-	public static String[] getFriends(String clientEmail) {
 
-		String[] friendList = db.getFriendList(clientEmail);
-		return friendList;
-	}
-
-	public static boolean addFriend(String clientEmail, String friendEmail) {
-		boolean isProfileinDB = db.checkProfile(friendEmail);
-
-		if (isProfileinDB) {
-			return db.addFriend(clientEmail, friendEmail);
-		} else if (!isProfileinDB) {
-			return false;
 		}
 	}
 
+	public static void main(String[] args) {
+		launch(args);
+	}
 }
