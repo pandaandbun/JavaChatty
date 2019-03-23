@@ -1,4 +1,4 @@
-package DB;
+package Server.Database;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class User implements Serializable {
     public String getpassword(){
         return password;
     }
-
+    
     public User(String email, String password){
         this.email      = email;
         this.password   = password;

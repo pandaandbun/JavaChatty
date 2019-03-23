@@ -1,12 +1,14 @@
+<<<<<<< HEAD
 package DB;
+=======
+package Server.Database;
+>>>>>>> c491c52df210562f7a062dc70b31fdd5e79c711a
 
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.File;
-import java.io.File.*;
-import DB.User;
+import Server.Database.User;
+
 
 public class createProfile {
 
@@ -27,7 +29,6 @@ public class createProfile {
         boolean exist = tmp.exists();
         return exist;
     }
-
 
     public static void WriteObjectToFile(String fileName, User user) {
 
