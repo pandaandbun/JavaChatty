@@ -1,4 +1,5 @@
 # CSCI 2020U - Final Project - JavaChatty
+github URL https://github.com/ricosandard/JavaChatty
 
 ## Contributor:
 - Liangyu Zhao
