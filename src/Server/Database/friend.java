@@ -7,9 +7,6 @@ import java.io.File.*;
 import java.util.ArrayList;
 import java.util.List;
 import DB.User;
-import DB.createProfile;
-import DB.Login;
-import DB.createProfile;
 
 public class friend{
     public static List<String> getFriendList(String ClientEmail){
@@ -19,7 +16,7 @@ public class friend{
 
     public static void main(String[] args) {
         User user = readObjectFile("975284274@qq.com"); // thisobejct file contain 3 friend 1,2,3;
-
+        addFriend("975284274@qq.com","4");
         List<String> fl = getFriendList("975284274@qq.com");
         for (int i = 0; i < fl.size();i++){
             System.out.println(fl.get(i));
@@ -27,11 +24,16 @@ public class friend{
 
     }
 
+    public static String getname(String clientEmail){
+        User user = readObjectFile(clientEmail);
+        return user.getname();
+    }
+
     public static boolean addFriend(String clientEmail, String friendEmail){
         User user = readObjectFile(clientEmail);
         user.addFriend(friendEmail);
         createProfile objectIO = new createProfile();
-        objectIO.WriteObjectToFile(user.getemail(),user);
+        objectIO.WriteObjectToFile(user.getemail(),user,false);
         return true;
     }
 
@@ -53,7 +55,7 @@ public class friend{
         createProfile objectIO = new createProfile();
 
         User user = new User(email,password);//should get information by here
-        objectIO.WriteObjectToFile(user.getemail(),user);
+        objectIO.WriteObjectToFile(user.getemail(),user, true);
         if (checkProfile(user.getemail()) == true){
             return true;
         }
@@ -67,13 +69,13 @@ public class friend{
     }
 
 
-    public static void WriteObjectToFile(String fileName, User user) {
+    public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
 
         try {
-            //if (checkProfile(fileName) == true){
-            //    System.out.println("user data already exist");
-            //    return;
-            //}
+            if ((checkProfile(fileName) == true) && (indicator == true)){
+                System.out.println("user data already exist");
+                return;
+            }
             File f = new File(fileName);
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
             oos.writeObject(user);

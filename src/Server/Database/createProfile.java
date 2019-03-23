@@ -1,14 +1,10 @@
-<<<<<<< HEAD
-package DB;
-=======
-package Server.Database;
->>>>>>> c491c52df210562f7a062dc70b31fdd5e79c711a
-
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.io.File;
-import Server.Database.User;
-
+import java.io.File.*;
+import DB.User;
 
 public class createProfile {
 
@@ -17,7 +13,7 @@ public class createProfile {
         createProfile objectIO = new createProfile();
 
         User user = new User(email,password);//should get information by here
-        objectIO.WriteObjectToFile(user.getemail(),user);
+        objectIO.WriteObjectToFile(user.getemail(),user,true);
         if (checkProfile(user.getemail()) == true){
             return true;
         }
@@ -30,13 +26,14 @@ public class createProfile {
         return exist;
     }
 
-    public static void WriteObjectToFile(String fileName, User user) {
+
+    public static void WriteObjectToFile(String fileName, User user, boolean indicator) {
 
         try {
-            //if (checkProfile(fileName) == true){
-            //    System.out.println("user data already exist");
-            //    return;
-            //}
+            if ((checkProfile(fileName) == true) && (indicator == true)){
+                System.out.println("user data already exist");
+                return;
+            }
             File f = new File(fileName);
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
             oos.writeObject(user);

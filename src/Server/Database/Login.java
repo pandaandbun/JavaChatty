@@ -1,16 +1,10 @@
-<<<<<<< HEAD
-package DB;
-
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-=======
-package Server.Database;
-
->>>>>>> c491c52df210562f7a062dc70b31fdd5e79c711a
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.File;
-import Server.Database.User;
+import java.io.File.*;
+import DB.User;
 
 public class Login{
     public boolean LogIn(String email, String password){
