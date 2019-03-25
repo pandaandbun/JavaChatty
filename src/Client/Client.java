@@ -1,6 +1,5 @@
 package Client;
 
-import Client.ClientGUI;
 import javafx.scene.control.TextArea;
 
 import java.io.*;
@@ -19,25 +18,35 @@ public class Client {
 	private TextArea taBox;
 
 	// constructor
-	public Client(TextArea taBox) {
-		this.taBox = taBox;
+	public Client() {
+		// this.taBox = taBox;
 		try {
 			// Client - Server Connection Set Up
 			connectToServer();
 			setupStreams();
 
-			// Creating a new thread to listen
-			new Thread(() -> {
-				try {
-					listener();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}).start();
-
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+	}
+
+	public void setUpdatechat(TextArea taBox) {
+		this.taBox = taBox;
+	}
+
+	public void startListener() {
+		// Creating a new thread to listen
+		new Thread(() -> {
+			try {
+				listener();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
+	}
+
+	public DataInputStream getInput() {
+		return input;
 	}
 
 	// Connect to server
@@ -57,19 +66,17 @@ public class Client {
 		String message = "";
 		do {
 			message = (String) input.readUTF();
-			if (message.equals("END")) {
-				closeConnection();
+			if (!message.equals("END")) {
+				taBox.appendText(message);
 			}
-			taBox.appendText(message);
 		} while (!message.equals("END"));
 	}
 
 	// Close connection
-	private void closeConnection() {
+	public void closeConnection() {
 		try {
 			output.close();
 			connection.close();
-			System.exit(0);
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}

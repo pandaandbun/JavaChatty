@@ -41,11 +41,13 @@ public class Server extends Application {
 	public void start(Stage primaryStage) {
 		// Setting the text display to be not editable
 		ta.setEditable(false);
+		ta.setStyle("-fx-text-fill: white;-fx-font-size: 15px;");
 
 		// Adding Text Area and Exit Button to a vertical pane
 		vb.getChildren().addAll(ta, exitBt);
 		vb.setPadding(new Insets(20, 20, 50, 20));
 		vb.setSpacing(10);
+		vb.setStyle("-fx-base: rgba(60, 60, 60, 255);");
 
 		// Set action on exit to terminate the program
 		exitBt.setOnAction(e -> {
@@ -54,7 +56,7 @@ public class Server extends Application {
 
 		// Create a scene and place it in the stage
 		Scene scene = new Scene(vb);
-		primaryStage.setTitle("Lab 10"); // Set the stage title
+		primaryStage.setTitle("JavaChatty's Server"); // Set the stage title
 		primaryStage.setScene(scene); // Place the scene in the stage
 		primaryStage.show(); // Display the stage
 
@@ -65,7 +67,7 @@ public class Server extends Application {
 		try {
 			// Create a server socket
 			serverSocket = new ServerSocket(8080);
-			Platform.runLater(() -> ta.appendText("MultiThreadServer started at " + new Date() + '\n'));
+			Platform.runLater(() -> ta.appendText("JavaChatty's Server started at " + new Date() + '\n'));
 
 			while (true) {
 				// Listen for a new connection request
@@ -100,16 +102,6 @@ public class Server extends Application {
 				din = new DataInputStream(socket.getInputStream());
 				dout = new DataOutputStream(socket.getOutputStream());
 
-				// Introduction
-				dout.writeUTF("SERVER: Welcome to JavaChatty. The best Messenger App in CSCI 2020 - 2019."
-						+ "\nPlease type in your password in the Message Box for Registration and Login. "
-						+ "\nHow To Use:"
-						+ "\n1. Register/Login: Enter your username in User and password in Password/Message."
-						+ "\n2. Add Friend/Get Friend: Enter your username in User and/or your friend's username in Friend"
-						+ "\n3. Send: Enter your username in User, your friend's username in Friend and the message in  Password/Message"
-						+ "\n4. Exit: Enter your username, if you logged in, in the User. If not, just press Exit."
-						+ "\nEnjoy JavaChatty!");
-
 				// Continuously serve the client
 				while (true) {
 
@@ -125,11 +117,7 @@ public class Server extends Application {
 
 					// END
 					if (command.equals("END")) {
-						String clientEmail = "";
-						if (splitted.length > 1) {
-							clientEmail = splitted[1];
-						}
-						logOut(clientEmail);
+						End();
 						break;
 					}
 
@@ -152,6 +140,12 @@ public class Server extends Application {
 
 					// If Client is online
 					if (clients.containsKey(clientEmail)) {
+
+						// LOGOUT
+						if (command.equals("LOGOUT")) {
+							System.out.println("logout - 1");
+							logOut(clientEmail);
+						}
 
 						// ADD FRIEND
 						if (command.equals("ADDFRIEND")) {
@@ -201,14 +195,21 @@ public class Server extends Application {
 		}
 
 		// Logging the client out
+		public void End() throws IOException {
+			// dout.writeUTF("END");
+			din.close();
+			socket.close();
+		}
+
+		// Logging the client out
 		public void logOut(String clientEmail) throws IOException {
+			// System.out.println("Logout" + dout);
 			dout.writeUTF("END");
 			if (clients.containsKey(clientEmail)) {
 				clients.remove(clientEmail);
 			}
-
-			din.close();
-			socket.close();
+			// din.close();
+			// socket.close();
 		}
 
 		// Register the client to the Database
@@ -220,13 +221,11 @@ public class Server extends Application {
 				isProfileCreated = cb.createProfile(clientEmail, password);
 				if (isProfileCreated) {
 					clients.put(clientEmail, dout);
-					dout.writeUTF("\nSERVER: Account Registered. You are now Logged In");
-
-				} else {
-					dout.writeUTF("\nSERVER: Account Failed to Registered.");
+					// dout.writeUTF("\nSERVER: Account Registered. You are now Logged In");
+					dout.writeUTF("SUCCESS");
 				}
 			} else if (isProfileinDB) {
-				dout.writeUTF("\nSERVER: Account already existed.");
+				dout.writeUTF("FAIL");
 			}
 
 		}
@@ -237,19 +236,19 @@ public class Server extends Application {
 
 			if (isProfileinDB) {
 				if (clients.containsKey(clientEmail)) {
-					dout.writeUTF("\nSERVER: Account Already Online.");
+					dout.writeUTF("Account Already Online.");
 				}
 
 				if (!lg.LogIn(clientEmail, password)) {
-					dout.writeUTF("\nSERVER: Incorrect Email or Password.");
+					dout.writeUTF("Incorrect Email or Password.");
 				}
 
 				if (!clients.containsKey(clientEmail) && lg.LogIn(clientEmail, password)) {
 					clients.put(clientEmail, dout);
-					dout.writeUTF("\nSERVER: Account Logged In.");
+					dout.writeUTF("Account Logged In.");
 				}
 			} else if (!isProfileinDB) {
-				dout.writeUTF("\nSERVER: Account Not Registered.");
+				dout.writeUTF("Account Not Registered.");
 			}
 		}
 
