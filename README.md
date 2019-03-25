@@ -2,8 +2,8 @@
 github URL https://github.com/ricosandard/JavaChatty
 
 ## Contributor:
-- Liangyu Zhao
-- Tran Tien Anh Ta
+- Liangyu Zhao (User Database, User Authentication and Registration)
+- Tran Tien Anh Ta (Server - Client Connection, Multi Clients Threading, Basic GUI)
 
 ## Description:
 This is javachatty / a application about socket/thread/GUI/File IO.
