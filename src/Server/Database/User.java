@@ -34,7 +34,7 @@ public class User implements Serializable {
 
 
     public void addFriend(String friendEmail){
-        if (checkFriendExist(friendEmail) == true){
+        if (checkFriendExist(friendEmail)){
             System.out.println("friend already exists");
             return;
         }

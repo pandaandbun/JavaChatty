@@ -39,14 +39,17 @@ public class Server extends Application {
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) {
+
 		// Setting the text display to be not editable
 		ta.setEditable(false);
-		ta.setStyle("-fx-text-fill: white;-fx-font-size: 15px;");
 
 		// Adding Text Area and Exit Button to a vertical pane
 		vb.getChildren().addAll(ta, exitBt);
 		vb.setPadding(new Insets(20, 20, 50, 20));
 		vb.setSpacing(10);
+
+		// Styling
+		ta.setStyle("-fx-text-fill: white;-fx-font-size: 15px;");
 		vb.setStyle("-fx-base: rgba(60, 60, 60, 255);");
 
 		// Set action on exit to terminate the program
@@ -60,10 +63,10 @@ public class Server extends Application {
 		primaryStage.setScene(scene); // Place the scene in the stage
 		primaryStage.show(); // Display the stage
 
-		new Thread(() -> listen()).start();
+		new Thread(() -> createConnection()).start();
 	}
 
-	private void listen() {
+	private void createConnection() {
 		try {
 			// Create a server socket
 			serverSocket = new ServerSocket(8080);
@@ -88,6 +91,7 @@ public class Server extends Application {
 		private Socket socket;
 		private DataInputStream din;
 		private DataOutputStream dout;
+		private String line = "";
 
 		/** Construct a thread */
 		public ServerThread(Socket socket) {
@@ -99,78 +103,107 @@ public class Server extends Application {
 		public void run() {
 			try {
 				// Create data input and output streams
-				din = new DataInputStream(socket.getInputStream());
-				dout = new DataOutputStream(socket.getOutputStream());
+				setupStreams();
+
+				boolean runServer = true;
 
 				// Continuously serve the client
-				while (true) {
+				while (runServer) {
 
 					// Listen for a message from the clients
-					String line = din.readUTF();
+					enableListener();
 
 					// Making sense of the message sent by the client
 					String[] splitted = line.split("#");
 					String command = splitted[0];
+					String clientEmail;
+					String password;
+					String friendEmail;
+					String message;
 
-					// Add chat to the Text Area
+					// Add client command to the server display
 					ta.appendText(line + '\n');
 
-					// END
-					if (command.equals("END")) {
-						End();
+					switch (command) {
+
+					case "REGISTER":
+						if (validateCommand(splitted, 3)) {
+
+							clientEmail = splitted[1];
+							password = splitted[2];
+
+							Register(clientEmail, password);
+						} else {
+							dout.writeUTF("\nSERVER: Please fill in all Text Fields");
+						}
 						break;
-					}
 
-					/* HANDLING CLIENTS COMMANDS */
+					case "LOGIN":
+						if (validateCommand(splitted, 3)) {
+							clientEmail = splitted[1];
+							password = splitted[2];
 
-					// REGISTRATION
-					if (command.equals("REGISTER")) {
-						String clientEmail = splitted[1];
-						String password = splitted[2];
+							Login(clientEmail, password);
+						}
+						break;
 
-						Register(clientEmail, password);
-					} // LOGIN
-					else if (command.equals("LOGIN")) {
-						String clientEmail = splitted[1];
-						String password = splitted[2];
-						Login(clientEmail, password);
-					}
-
-					String clientEmail = splitted[1];
-
-					// If Client is online
-					if (clients.containsKey(clientEmail)) {
-
-						// LOGOUT
-						if (command.equals("LOGOUT")) {
-							System.out.println("logout - 1");
+					case "LOGOUT":
+						if (validateCommand(splitted, 2)) {
+							clientEmail = splitted[1];
 							logOut(clientEmail);
 						}
+						break;
 
-						// ADD FRIEND
-						if (command.equals("ADDFRIEND")) {
-							String friendEmail = splitted[2];
+					case "ADDFRIEND":
+						if (validateCommand(splitted, 3)) {
+							clientEmail = splitted[1];
+							friendEmail = splitted[2];
+
 							addFriend(clientEmail, friendEmail);
 						}
+						break;
 
-						// GETFRIEND
-						if (command.equals("GETFRIEND")) {
-							getFriend(clientEmail);
-						}
+					case "MESSAGE":
+						if (validateCommand(splitted, 4)) {
+							clientEmail = splitted[1];
+							friendEmail = splitted[2];
+							message = splitted[3];
 
-						// MESSAGE
-						if (command.equals("MESSAGE")) {
-							String friendEmail = splitted[2];
-							String message = splitted[3];
 							sendMessage(clientEmail, friendEmail, message);
 						}
-					} else {
-						dout.writeUTF("\nSERVER: Please Logged In or Register.");
+						break;
+
+					case "END":
+						End();
+						runServer = false;
+						break;
 					}
 				}
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
+		}
+
+		public boolean validateCommand(String[] splitted, int correctSize) throws IOException {
+			boolean validated = true;
+
+			if (splitted.length < correctSize) {
+				validated = false;
+				dout.writeUTF("\nSERVER: Please fill in all necessary Text Fields");
+			}
+
+			return validated;
+		}
+
+		public void enableListener() throws IOException {
+			line = (String) din.readUTF();
+		}
+
+		// Set up streams
+		private void setupStreams() throws IOException {
+			din = new DataInputStream(socket.getInputStream());
+			dout = new DataOutputStream(socket.getOutputStream());
+			dout.flush();
 		}
 
 		// Send message to friend
@@ -181,6 +214,7 @@ public class Server extends Application {
 			if (isProfileinDB) {
 				if (friendList.contains(friendEmail)) {
 					if (clients.containsKey(friendEmail)) {
+						dout.writeUTF("\n" + clientEmail + ": " + message);
 						clients.get(friendEmail).writeUTF("\n" + clientEmail + ": " + message);
 						clients.get(friendEmail).flush();
 					} else {
@@ -245,7 +279,7 @@ public class Server extends Application {
 
 				if (!clients.containsKey(clientEmail) && lg.LogIn(clientEmail, password)) {
 					clients.put(clientEmail, dout);
-					dout.writeUTF("Account Logged In.");
+					dout.writeUTF("Account Logged In.#" + getFriend(clientEmail));
 				}
 			} else if (!isProfileinDB) {
 				dout.writeUTF("Account Not Registered.");
@@ -258,7 +292,9 @@ public class Server extends Application {
 
 			if (isProfileinDB) {
 				if (fr.addFriend(clientEmail, friendEmail)) {
-					dout.writeUTF("\nSERVER: " + friendEmail + " was added to " + clientEmail + "'s Friend List.");
+					// dout.writeUTF("\nSERVER: " + friendEmail + " was added to " + clientEmail +
+					// "'s Friend List.");
+					dout.writeUTF("ADDFRIEND#" + friendEmail);
 				} else {
 					dout.writeUTF("\nSERVER: " + friendEmail + " is already in " + clientEmail + "'s Friend List.");
 				}
@@ -268,14 +304,11 @@ public class Server extends Application {
 		}
 
 		// Getting the client friend list
-		public void getFriend(String clientEmail) throws IOException {
-			boolean isProfileinDB = cb.checkProfile(clientEmail);
+		public String getFriend(String clientEmail) throws IOException {
+			List<String> friendList = fr.getFriendList(clientEmail);
+			String friends = String.join(",", friendList);
 
-			if (isProfileinDB) {
-				dout.writeUTF("\nSERVER: " + clientEmail + "'s Friend List: " + fr.getFriendList(clientEmail));
-			} else if (!isProfileinDB) {
-				dout.writeUTF("\nSERVER: " + clientEmail + " does not exist.");
-			}
+			return friends;
 		}
 
 	}

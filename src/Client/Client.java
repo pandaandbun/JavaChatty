@@ -1,5 +1,7 @@
 package Client;
 
+import javafx.application.Platform;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 
 import java.io.*;
@@ -16,6 +18,8 @@ public class Client {
 
 	// Chat Box
 	private TextArea taBox;
+	
+	private ListView<String> friendList;
 
 	// constructor
 	public Client() {
@@ -32,6 +36,10 @@ public class Client {
 
 	public void setUpdatechat(TextArea taBox) {
 		this.taBox = taBox;
+	}
+	
+	public void setUpdateFriendList(ListView<String> friendList) {
+		this.friendList = friendList;
 	}
 
 	public void startListener() {
@@ -67,7 +75,16 @@ public class Client {
 		do {
 			message = (String) input.readUTF();
 			if (!message.equals("END")) {
-				taBox.appendText(message);
+				String[] serverMessage = message.split("#");
+				String serverCommand = serverMessage[0];
+				
+				if (serverCommand.equals("ADDFRIEND")) {
+					String friend = serverMessage[1];
+					//System.out.println(friend);
+					Platform.runLater(() -> friendList.getItems().add(friend));
+				} else {
+					taBox.appendText(message);
+				}
 			}
 		} while (!message.equals("END"));
 	}
