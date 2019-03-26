@@ -20,7 +20,7 @@ JavaChatty is a Multi-user Chat Application that lets you add your friends and m
 Windows:
 1. Run Server.java. 
 2. Run two or more instances of AccessGUI.java.
-3. Use default "User: rico - Password: 1234" with two friends to test JavaChatty if you don't want to Register.
+3. Use default "User: rico - Password: 1234" and "User: awa - Password: 1234" with two friends to test JavaChatty if you don't want to Register.
 4. If you want to create your own account then enter your desire Username and Password on AccessGUI.java and follow the instructions on the next page.
 
 ### Attention:
