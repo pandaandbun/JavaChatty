@@ -34,14 +34,17 @@ public class Client {
 		}
 	}
 
+	// Enable chat box to be updated
 	public void setUpdatechat(TextArea taBox) {
 		this.taBox = taBox;
 	}
 	
+	// Enable friend list to be updated
 	public void setUpdateFriendList(ListView<String> friendList) {
 		this.friendList = friendList;
 	}
 
+	// Start a listening thread
 	public void startListener() {
 		// Creating a new thread to listen
 		new Thread(() -> {
@@ -53,6 +56,7 @@ public class Client {
 		}).start();
 	}
 
+	// Get Input Stream
 	public DataInputStream getInput() {
 		return input;
 	}
@@ -88,6 +92,8 @@ public class Client {
 			}
 		} while (!message.equals("END"));
 	}
+	
+	// Close the user connection 
 
 	// Close connection
 	public void closeConnection() {
@@ -100,6 +106,8 @@ public class Client {
 	}
 
 	// Send message to server
+	
+	// Send a message to Server
 	public void sendMessage(String message) {
 		try {
 			output.writeUTF(message);

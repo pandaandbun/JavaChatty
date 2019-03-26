@@ -49,7 +49,7 @@ public class AccessGUI extends Application {
 
 		// Username field
 		TextField tfName = new TextField();
-		
+
 		// Password field
 		PasswordField passwordField = new PasswordField();
 
@@ -68,21 +68,21 @@ public class AccessGUI extends Application {
 
 		// Setting containers for Command Buttons
 		HBox accessBox = new HBox(regBt, logBt);
-		
+
 		// Set Text Flow
 		textFlow.getChildren().addAll(text1, text2);
 
 		// Adding everything into a vertical box
-		VBox rootBox = new VBox(alert,textFlow, userInputBox, accessBox, exitBt);
-		
+		VBox rootBox = new VBox(alert, textFlow, userInputBox, accessBox, exitBt);
+
 		// Prompt Text
 		tfName.setPromptText("Your username");
 		passwordField.setPromptText("Your password");
-		
+
 		// Set Color
 		text1.setFill(Color.RED);
 		text2.setFill(Color.BLUE);
-		
+
 		// Set Font
 		text1.setFont(font);
 		text2.setFont(font);
@@ -155,10 +155,12 @@ public class AccessGUI extends Application {
 		primaryStage.show(); // Display the stage
 	}
 
+	// Listen for server reply
 	public void enableListener() throws IOException {
 		serverMessage = (String) input.readUTF();
 	}
-	
+
+	// Exit the program
 
 	public void exitHandler() {
 		String message = "END" + "#";
@@ -167,6 +169,7 @@ public class AccessGUI extends Application {
 		System.exit(0);
 	}
 
+	// Login to JavaChatty
 	public void loginHandler(TextField tfName, TextField tfPass, TextArea alert, Stage primaryStage) {
 		String username = tfName.getText();
 		String message = "LOGIN" + "#" + username + "#" + tfPass.getText();
@@ -176,7 +179,7 @@ public class AccessGUI extends Application {
 			enableListener();
 			String[] serverCommand = serverMessage.split("#");
 			String reply = serverCommand[0];
-			
+
 			if (reply.equals("Account Logged In.")) {
 				primaryStage.hide();
 				String friends;
@@ -201,7 +204,8 @@ public class AccessGUI extends Application {
 			exp.printStackTrace();
 		}
 	}
-	
+
+	// Register to JavaChatty
 
 	public void registrationHandler(TextField tfName, TextField tfPass, TextArea alert, Stage primaryStage) {
 		String username = tfName.getText();
@@ -225,6 +229,7 @@ public class AccessGUI extends Application {
 		}
 	}
 
+	// Main
 	public static void main(String[] args) {
 		launch(args);
 	}

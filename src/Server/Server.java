@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 public class Server extends Application {
 
 	// Mapping of sockets to clientEmails
+	// Purpose: To keep track of online users
 	private Hashtable<String, DataOutputStream> clients = new Hashtable<String, DataOutputStream>();
 
 	// Text area for displaying contents
@@ -79,7 +80,7 @@ public class Server extends Application {
 				// Display the client number
 				Platform.runLater(() -> ta.appendText("Connection from " + socket + " at " + new Date() + '\n'));
 
-				// Create a new thread for the connection
+				// Create a new thread for each user
 				new ServerThread(socket);
 			}
 		} catch (IOException ex) {
@@ -116,6 +117,7 @@ public class Server extends Application {
 					// Making sense of the message sent by the client
 					String[] splitted = line.split("#");
 					String command = splitted[0];
+					
 					String clientEmail;
 					String password;
 					String friendEmail;
@@ -124,8 +126,10 @@ public class Server extends Application {
 					// Add client command to the server display
 					ta.appendText(line + '\n');
 
+					// Client Command Handlers
 					switch (command) {
 
+					// When a new user register to the Database
 					case "REGISTER":
 						if (validateCommand(splitted, 3)) {
 
@@ -138,6 +142,7 @@ public class Server extends Application {
 						}
 						break;
 
+					// When a user login into JavaChatty
 					case "LOGIN":
 						if (validateCommand(splitted, 3)) {
 							clientEmail = splitted[1];
@@ -147,6 +152,7 @@ public class Server extends Application {
 						}
 						break;
 
+					// when a user wants to log out
 					case "LOGOUT":
 						if (validateCommand(splitted, 2)) {
 							clientEmail = splitted[1];
@@ -154,6 +160,7 @@ public class Server extends Application {
 						}
 						break;
 
+					// When a user add a friend into their friend list
 					case "ADDFRIEND":
 						if (validateCommand(splitted, 3)) {
 							clientEmail = splitted[1];
@@ -163,6 +170,7 @@ public class Server extends Application {
 						}
 						break;
 
+					// When a user send a message to their friend
 					case "MESSAGE":
 						if (validateCommand(splitted, 4)) {
 							clientEmail = splitted[1];
@@ -173,6 +181,7 @@ public class Server extends Application {
 						}
 						break;
 
+					// When a user exit JavaChatty
 					case "END":
 						End();
 						runServer = false;
@@ -184,6 +193,8 @@ public class Server extends Application {
 			}
 		}
 
+		// Validate the client command
+		// Purpose: Clients make mistakes and the server needs to catch them 
 		public boolean validateCommand(String[] splitted, int correctSize) throws IOException {
 			boolean validated = true;
 
@@ -195,10 +206,12 @@ public class Server extends Application {
 			return validated;
 		}
 
+		// Enabling server to listen to clients messages
 		public void enableListener() throws IOException {
 			line = (String) din.readUTF();
 		}
 
+		// Set up 
 		// Set up streams
 		private void setupStreams() throws IOException {
 			din = new DataInputStream(socket.getInputStream());

@@ -3,8 +3,6 @@ package Client;
 import java.io.IOException;
 
 import Client.Client;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 
 import javafx.scene.Scene;
@@ -86,7 +84,7 @@ public class ChatBoxGUI {
 
 		// Set Text Flow
 		title.getChildren().addAll(text1, text2);
-		
+
 		// Set Color
 		text1.setFill(Color.RED);
 		text2.setFill(Color.BLUE);
@@ -98,12 +96,13 @@ public class ChatBoxGUI {
 		// Prompt Text
 		tfMsg.setPromptText("Your message");
 		tffriend.setPromptText("Add your friend username here and press Add Friend to start talking to them.");
+		// Introduction
 		chatBox.setPromptText("Welcome to JavaChatty!\nThe best Chat App of 2019. Here's how you use it:\r"
 				+ "1. To message somone, you must first add them as a friend. Enter their username in the Friend's Text Field and press Add Friend.\r"
 				+ "2. After adding them as friend, you can select their username in your Friend List and type in the message you wish to send them.\r"
 				+ "3. Now that you have added a friend, select them as the receiver and type in your message. Press send so you can start chatting.\r"
 				+ "4. Be warn, they may not be online.");
-		
+
 		// Set Images sizes
 		addFriendImg.setFitHeight(40);
 		addFriendImg.setFitWidth(40);
@@ -166,6 +165,7 @@ public class ChatBoxGUI {
 
 	}
 
+	// Send message to server
 	public void sendMessage(ListView<String> friendList, TextField usernameBox, TextField tfMsg, Client cli) {
 		String friendEmail = friendList.getSelectionModel().getSelectedItem();
 		String message = "MESSAGE" + "#" + usernameBox.getText() + "#" + friendEmail + "#" + tfMsg.getText();
@@ -173,12 +173,14 @@ public class ChatBoxGUI {
 		cli.sendMessage(message);
 	}
 
+	// Add friend to friend list
 	public void addFriend(TextField usernameBox, TextField tffriend, Client cli) {
 		String message = "ADDFRIEND" + "#" + usernameBox.getText() + "#" + tffriend.getText();
 
 		cli.sendMessage(message);
 	}
 
+	// Log user out
 	public void logOut(Stage window, Stage root, TextField usernameBox, Client cli) {
 		window.hide();
 		String message = "LOGOUT" + "#" + usernameBox.getText();
